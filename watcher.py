@@ -47,26 +47,26 @@ class Invocation(BaseModel):
     async def create_or_update_flow_run(self):
         # we saw the invocation end after the start
         if self.flow_run_id and self.end_time:
-            await self.set_terminal_state()
+            await self._set_terminal_state()
 
         # we saw the invocation start before the end
         elif self.start_time and not self.end_time:
-            flow_run = await self.create_run()
+            flow_run = await self._create_run()
             self.flow_run_id = flow_run.id
 
         # we saw the invocation end before the start
         elif self.start_time and self.end_time:
-            flow_run = await self.create_run()
+            flow_run = await self._create_run()
             self.flow_run_id = flow_run.id
-            await self.set_terminal_state()
+            await self._set_terminal_state()
 
-    async def create_run(self):
+    async def _create_run(self):
         return await get_client().create_flow_run(
             flow=lambda_flow.with_options(name=self.lambda_name),
             state=Running(timestamp=self.start_time),
         )
 
-    async def set_terminal_state(self):
+    async def _set_terminal_state(self):
         await get_client().set_flow_run_state(
             flow_run_id=self.flow_run_id,
             state=Completed(timestamp=self.end_time)
