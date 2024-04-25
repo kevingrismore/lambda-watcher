@@ -218,6 +218,6 @@ def lambda_flow():
 
 if __name__ == "__main__":
     watcher = QueueWatcher(
-        queue_url="https://sqs.us-east-2.amazonaws.com/455346737763/lambda-watcher.fifo"
+        queue_url="<your-sqs-queue-url>"
     )
     asyncio.run(watcher.run())
