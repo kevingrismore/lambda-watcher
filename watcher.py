@@ -30,19 +30,20 @@ import json
 from datetime import datetime
 from enum import Enum
 from uuid import UUID
+from typing import Optional
 
 import boto3
 from prefect import flow, get_client
 from prefect.states import Running, Completed, Failed
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Invocation(BaseModel):
-    lambda_name: str
-    flow_run_id: UUID | None
-    start_time: datetime | None
-    end_time: datetime | None
-    success: bool | None
+    lambda_name: str = Field(...)
+    flow_run_id: Optional[UUID] = Field(default=None)
+    start_time: Optional[datetime] = Field(default=None)
+    end_time: Optional[datetime] = Field(default=None)
+    success: Optional[bool] = Field(default=None)
 
     async def create_or_update_flow_run(self):
         # we saw the invocation end after the start
